@@ -6,7 +6,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Literata&display=swap" rel="stylesheet">
 
   </head>
-  <PixiMidiBlock src="/midi/12similar/query.mid"/>
+  <SideBar>
+    <!-- <RangeInput title="Tempo" v-bind:value="tempo" /> -->
+    <!-- <RangeInput title="Sustain Opacity" v-model="sustainOpacity" /> -->
+    <RangeInput label="Sustain Opacity" :value=sustainOpacity @input="value => sustainOpacity = value" min=0 max=1 step=0.01 /> 
+    <RangeInput label="Tempo" :value=tempo @input="value => tempo = value" min=40 max=144 step=1 /> 
+  </SideBar>
+  <PixiMidiBlock src="/midi/12similar/query.mid" :sustain-opacity="sustainOpacity" :bpm="tempo" />
+  <PixiMidiBlock src="/midi/29similar/query.mid" :sustain-opacity="sustainOpacity" :bpm="tempo" />
   <!-- <PixiMidiBlock src="/midi/12similar/query.mid"/> -->
 </template>
 
@@ -14,12 +21,16 @@
 /* eslint-disable */
 import MidiBlock from './components/MidiBlock.vue'
 import PixiMidiBlock from './components/PixiMidiBlock.vue';
+import SideBar from './components/SideBar.vue';
+import RangeInput from './components/RangeInput.vue';
 
 export default {
   name: 'App',
   components: {
     MidiBlock,
-    PixiMidiBlock
+    PixiMidiBlock,
+    SideBar,
+    RangeInput
   },
   setup() {
     var scripts = [
@@ -32,6 +43,17 @@ export default {
       tag.setAttribute("src", script);
       document.head.appendChild(tag);
     });
+  },
+  data() {
+    return {
+      sustainOpacity: 0.4,
+      tempo:100,
+    }
+  },
+  methods: {
+    print(value) {
+      console.log(value);
+    }
   }
 }
 </script>

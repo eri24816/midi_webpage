@@ -1,8 +1,6 @@
 <template>
     <div ref="root">
-        <h1>
-            Pixi Midi Block
-        </h1>
+        {{src}}
     </div>
 </template>
 
@@ -11,7 +9,10 @@
 /* eslint-disable */
 import * as PIXI from '@/assets/pixi.mjs'
 const { Midi } = require('@tonejs/midi')
-import { Piano } from '@tonejs/piano'
+import { inject } from 'vue'
+import { Midi2Pitch } from '@/assets/musicUtils.js'
+import { HSVtoRGB } from '@/assets/graphicsUtils.js'
+
 function InitPixi() {
     const root = this.$refs.root;
 
@@ -21,15 +22,14 @@ function InitPixi() {
     app.stage.hitArea = app.screen;
 
     const cursorPreviewLine = new PIXI.Graphics()
-        .lineStyle(2, 0x00ff00, 1)
-        .lineTo(0, app.screen.height);
+        .lineStyle(2, 0xffffff, .2)
+        .lineTo(0, app.screen.height); 
     cursorPreviewLine.x = -100;
-    cursorPreviewLine.alpha=0.2;
 
     app.stage.addChild(cursorPreviewLine);
 
     const cursorLine = new PIXI.Graphics()
-        .lineStyle(2, 0x00ff00, 1)
+        .lineStyle(2, 0xffffff, .5)
         .lineTo(0, app.screen.height); 
 
     app.stage.addChild(cursorLine);
@@ -50,8 +50,10 @@ function InitPixi() {
     app.stage.addEventListener('pointerdown', (e) => {
         this.tick = (e.data.global.x + this.shift) / this.PixelPerTick;
         this.StopSounds();
-        this.lastTick = this.tick;
+        this.lastTick = Math.floor(this.tick - 1);
+        this.lastUpdateTime = null;
     });
+
     this.pixi = app;
 
 }
@@ -92,39 +94,36 @@ function LoadMidi() {
 
         this.PixelPerTick = (this.w - 2*this.padding) / maxTick;
         this.shift = - this.padding;
-        // draw the notes with pixi
-        const rectList = [];
+        
         const app = this.pixi;
+
+        // generate bar lines and beat lines
+        const beatLines = [];
+
+        for (let i = 0; i <= maxTick; i += 8) {
+            const alpha=[0.1,0.01,0.01,0.01,0.1,0.01,0.01,0.01]
+            const line = new PIXI.Graphics()
+                .lineStyle(2, 0xffffff, alpha[(i/8)%8])
+                .lineTo(0, app.screen.height); 
+            app.stage.addChild(line);
+            beatLines.push(line);
+        }
+        this.beatLines = beatLines;
+        
+        // draw each notes with pixi
         noteList.forEach((note) => {
             const rect = new PIXI.Graphics()
+            note.graphics = rect;
             app.stage.addChild(rect);
-            rectList.push(rect);
         });
         this.noteList = noteList;
-        this.rectList = rectList;
+
+
+        
     });
-    const piano = new Piano({
-	velocities: 5,
-    volume: {
-		pedal: -12,
-		strings: -12,
-		keybed: -12,
-		harmonics: -12,
-	}
-    })
-    piano.toDestination()
-    piano.load().then(() => {
-        //piano.keyDown({note:"C7"});
-        //piano.keyDown({ note: "G6" });
-        this.piano = piano;
-    })
 }
-function Midi2Pitch(midiNum) {
-    const midiToPitch = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-    var pitch = midiToPitch[(midiNum - 12) % 12];
-    pitch += Math.floor((midiNum - 12) / 12);
-    return pitch;
-}
+
+ 
 function Update() {
     const time = new Date().getTime();
     const delta = this.lastUpdateTime?  time - this.lastUpdateTime:0;
@@ -135,12 +134,10 @@ function Update() {
     this.tick += delta / 1000.0 / 60.0 * this.bpm * this.tpb;
     let intTick = Math.floor(this.tick);
 
-
     for (let t = this.lastTick + 1; t <= intTick; t++) {
         if (this.keyUpMap.has(t)) {
             this.keyUpMap.get(t).forEach((note) => {
                 const pitch = Midi2Pitch(note.midi);
-
                 this.piano.keyUp({ note: pitch});
 
             });
@@ -148,12 +145,8 @@ function Update() {
 
         if (this.keyDownMap.has(t)) {
             this.keyDownMap.get(t).forEach((note) => {
-                const midiToPitch = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-                var pitch = midiToPitch[(note.midi - 12) % 12];
-                pitch += Math.floor((note.midi - 12) / 12);
-
+                const pitch = Midi2Pitch(note.midi);
                 this.piano.keyDown({ note: pitch, velocity: note.velocity});
-
             });
         }
 
@@ -163,19 +156,26 @@ function Update() {
     this.cursorLine.x = this.PixelPerTick * this.tick - this.shift;
 
     const gap = 1;
-    const zip = (a, b) => a.map((k, i) => [k, b[i]]);
-    zip(this.noteList, this.rectList).forEach((note_rect) => {
-        const note = note_rect[0];
-        const rect = note_rect[1];
+    this.noteList.forEach((note) => {
         const x = (note.ticks / 60) * this.PixelPerTick - this.shift;
         const y = (1-(note.midi - 21) / 88 )* (this.h);
         const w = (note.durationTicks / 60) * this.PixelPerTick - gap;
-        const h = (this.h)/88 - gap;
-        rect.clear();
-        rect.beginFill(0xffffff)
-        rect.drawRect(x, y, w, h)
-        rect.endFill();
+        const h = (this.h) / 88 - gap;
+        const brightnessGain = 1+ ((note.ticks / 60) <= this.tick?  Math.exp(0.3*((note.ticks / 60)-this.tick)):0);
+        note.graphics.clear();
+        note.graphics.beginFill(HSVtoRGB(note.midi / 12, 1 - (brightnessGain - 1) * 0.3, Math.min(1, note.velocity * this.sustainOpacity * brightnessGain)));
+        note.graphics.drawRect(x, y, w, h);
+        note.graphics.endFill();
+        note.graphics.beginFill(HSVtoRGB(note.midi / 12, 1 - (brightnessGain - 1) * 0.3, Math.min(1, note.velocity * brightnessGain)));
+        note.graphics.drawRect(x - (h + 2) / 2, y - 1, h + 2, h + 2);
+        note.graphics.endFill();
     });
+    // update beat lines
+    for(let i=0;i<this.beatLines.length;i++){
+        const line = this.beatLines[i];
+        line.x = (i * 8) * this.PixelPerTick - this.shift;
+    }
+
 }
 function StopSounds() {
     if (this.piano == null) return;
@@ -183,6 +183,7 @@ function StopSounds() {
         this.piano.keyUp({ note: Midi2Pitch(i) });
     }
 }
+
 export default {
     name: 'PixiMidiBlock',
     props: {
@@ -192,7 +193,7 @@ export default {
         },
         h: {
             type: Number,
-            default: 350
+            default: 250
         },
         padding: {
             type: Number,
@@ -201,7 +202,16 @@ export default {
         src: {
             type: String,
             default: ''
-        }
+        },
+        sustainOpacity: {
+            type: Number,
+            default: 0.4
+        },
+        bpm: {
+            type: Number,
+            default: 100
+        },
+        
     },
     data() {
         return {
@@ -210,11 +220,17 @@ export default {
             PixelPerTick: 10,
             tick: 0,
             lastTick: -1,
-            bpm: 120,
             tpb: 8,
             keyDownMap: null,
             keyUpMap: null,
-            timer: null
+            timer: null,
+            beatLines: [],
+        }
+    },
+    setup() {
+        const piano = inject('piano');
+        return {
+            piano
         }
     },
     mounted() {
