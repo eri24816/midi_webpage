@@ -130,6 +130,8 @@ function LoadMidi() {
             app.stage.addChild(rect);
         });
         this.noteList = noteList;
+        
+        this.UpdateCanvas();
     });
 }
 
@@ -166,6 +168,11 @@ function Update() {
     }
     this.lastTick = intTick;
 
+    this.UpdateCanvas();
+
+}
+function UpdateCanvas() {
+    
     this.cursorLine.x = this.PixelPerTick * this.tick - this.shift;
 
     const gap = 1;
@@ -188,7 +195,6 @@ function Update() {
         const line = this.beatLines[i];
         line.x = (i * 8) * this.PixelPerTick - this.shift;
     }
-
 }
 function StopSounds() {
     if (this.piano == null) return;
@@ -242,6 +248,9 @@ export default {
     watch: {
         src: function (newVal, oldVal) { 
             this.LoadMidi();
+        },
+        sustainOpacity: function(newVal, oldVal) {
+            this.UpdateCanvas();
         }
     },
     setup() {
@@ -258,7 +267,7 @@ export default {
             this.Update()
         }, 20);
     },
-    methods: {  InitPixi, LoadMidi, Update, StopSounds },
+    methods: {  InitPixi, LoadMidi, Update, UpdateCanvas,StopSounds },
     beforeDestroy() {
         console.log('destroy');
         this.$refs.root.removeChild(this.app.view);
