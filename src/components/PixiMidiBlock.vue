@@ -1,6 +1,6 @@
 <template>
     <div ref="root">
-        {{src}}
+        <!-- {{src}} -->
     </div>
 </template>
 
@@ -58,6 +58,8 @@ function InitPixi() {
 
 }
 function LoadMidi() {
+
+    console.log("Loading midi");
     Midi.fromUrl(this.src).then((midi) => {
         // store the notes into a map
         const noteList = midi.tracks[0].notes;
@@ -97,6 +99,16 @@ function LoadMidi() {
         
         const app = this.pixi;
 
+        // destroy all notes and beatlines of previous midi
+        if(this.noteList)
+            for (let i = 0; i < this.noteList.length; i++) {
+                app.stage.removeChild(this.noteList[i].graphics);
+            }
+        if(this.beatLines)
+            for (let i = 0; i < this.beatLines.length; i++) {
+                app.stage.removeChild(this.beatLines[i]);
+            }
+
         // generate bar lines and beat lines
         const beatLines = [];
 
@@ -117,9 +129,6 @@ function LoadMidi() {
             app.stage.addChild(rect);
         });
         this.noteList = noteList;
-
-
-        
     });
 }
 
@@ -224,7 +233,11 @@ export default {
             keyDownMap: null,
             keyUpMap: null,
             timer: null,
-            beatLines: [],
+        }
+    },
+    watch: {
+        src: function (newVal, oldVal) { 
+            this.LoadMidi();
         }
     },
     setup() {
@@ -242,6 +255,7 @@ export default {
     },
     methods: {  InitPixi, LoadMidi, Update, StopSounds },
     beforeDestroy() {
+        console.log('destroy');
         this.$refs.root.removeChild(this.app.view);
         clearInterval(this.timer);
     }

@@ -7,12 +7,12 @@
 
   </head>
   <SideBar>
-    <!-- <RangeInput title="Tempo" v-bind:value="tempo" /> -->
-    <!-- <RangeInput title="Sustain Opacity" v-model="sustainOpacity" /> -->
     <RangeInput label="Sustain Opacity" :value=sustainOpacity @input="value => sustainOpacity = value" min=0 max=1 step=0.01 /> 
     <RangeInput label="Tempo" :value=tempo @input="value => tempo = value" min=40 max=144 step=1 /> 
   </SideBar>
-  <PixiMidiBlock src="/midi/12similar/query.mid" :sustain-opacity="sustainOpacity" :bpm="tempo" />
+  <PixiMidiBlock :src="src1" :sustain-opacity="sustainOpacity" :bpm="tempo" />
+  <FileSelector root='/midi/similar/' @input="value => src1=value"/>
+
   <PixiMidiBlock src="/midi/29similar/query.mid" :sustain-opacity="sustainOpacity" :bpm="tempo" />
   <!-- <PixiMidiBlock src="/midi/12similar/query.mid"/> -->
 </template>
@@ -23,6 +23,7 @@ import MidiBlock from './components/MidiBlock.vue'
 import PixiMidiBlock from './components/PixiMidiBlock.vue';
 import SideBar from './components/SideBar.vue';
 import RangeInput from './components/RangeInput.vue';
+import FileSelector from './components/FileSelector.vue';
 
 export default {
   name: 'App',
@@ -30,7 +31,8 @@ export default {
     MidiBlock,
     PixiMidiBlock,
     SideBar,
-    RangeInput
+    RangeInput,
+    FileSelector
   },
   setup() {
     var scripts = [
@@ -47,7 +49,9 @@ export default {
   data() {
     return {
       sustainOpacity: 0.4,
-      tempo:100,
+      tempo: 100,
+      src1: '/midi/12similar/query.mid',
+      src2: '/midi/29similar/query.mid'
     }
   },
   methods: {
@@ -69,6 +73,6 @@ export default {
 }
 body{
   
-  background-color: #101010;
+  background-color: #000000;
 }
 </style>
