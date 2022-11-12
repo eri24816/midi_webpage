@@ -52,6 +52,7 @@ function InitPixi() {
         this.StopSounds();
         this.lastTick = Math.floor(this.tick - 1);
         this.lastUpdateTime = null;
+        this.whoIsPlaying.id = this.playerId;
     });
 
     this.pixi = app;
@@ -134,6 +135,9 @@ function LoadMidi() {
 
  
 function Update() {
+    if (this.whoIsPlaying.id != this.playerId) {
+        return;
+    }
     const time = new Date().getTime();
     const delta = this.lastUpdateTime?  time - this.lastUpdateTime:0;
     this.lastUpdateTime = time;
@@ -227,8 +231,8 @@ export default {
             shift: -10,
             duration: 0,
             PixelPerTick: 10,
-            tick: 0,
-            lastTick: -1,
+            tick: 1000000,
+            lastTick: 1000000,
             tpb: 8,
             keyDownMap: null,
             keyUpMap: null,
@@ -242,8 +246,9 @@ export default {
     },
     setup() {
         const piano = inject('piano');
+        const whoIsPlaying = inject('whoIsPlaying');
         return {
-            piano
+            piano, whoIsPlaying, playerId: Math.random()
         }
     },
     mounted() {

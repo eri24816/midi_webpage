@@ -1,5 +1,26 @@
 <template>
-
+    <div style="">
+        <div style="display:inline-block; ">
+            <PixiMidiBlock :src="src" :w="w" :h="h" :padding="padding" :sustain-opacity="sustainOpacity" :bpm="bpm" />
+        </div>
+        <div style="display:inline-block; width: 500px;   text-align: left;">
+            
+            <div style="margin:30px">
+                <p>
+                    Song name: {{ metadata.title }}
+                </p>
+                <p>
+                    Bar: {{ metadata.start }} - {{ metadata.end }}
+                </p>
+                <p>
+                    Similarity: {{ metadata.score }}
+                </p>
+            </div>
+            
+            <FileSelector root='/midi/similar/' @input="UpdateSrc" />
+            <br/>
+        </div>
+    </div>
 </template>
 
 <script>
@@ -7,8 +28,14 @@
 import PixiMidiBlock from './PixiMidiBlock.vue';
 import FileSelector from './FileSelector.vue';
 
+function UpdateSrc(value) {
+    this.src = value.name;
+    this.metadata = value.metadata;
+}
+
 export default {
-  name: 'MidiBlockWithFile',
+    name: 'MidiBlockWithFile',
+  
   components: {
     PixiMidiBlock,
     FileSelector
@@ -40,7 +67,8 @@ export default {
     return {
       sustainOpacity: 0.4,
       tempo: 100,
-      filename: '/midi/12similar/query.mid'
+        src: '/midi/12similar/query.mid',
+        metadata: '',
     }
   },
   emits:['input'],
@@ -51,5 +79,7 @@ export default {
     }
 
     return { updateValue }
-  },
+    },
+    methods: { UpdateSrc },
 }
+</script>

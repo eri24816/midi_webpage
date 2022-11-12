@@ -1,18 +1,18 @@
 <template>
     <div>
         <div style="display: inline-block;">
-            <Select2  name="folder" id="folder" v-model="folder" @select="(event)=>OnFolderSelect(event.id)" :options="folders" :settings="{width: '100px',minimumResultsForSearch: Infinity}" />
+            <Select2  name="folder"  v-model="folder" @select="(event)=>OnFolderSelect(event.id)" :options="folders" :settings="{width: '100px',minimumResultsForSearch: Infinity}" />
         </div>
         /
         <div style="display: inline-block;">
-            <Select2  name="file" id="file" v-model="filename" @select="(event)=>OnFileSelect(event.id)" :options="filenames" :settings="{width: '200px',minimumResultsForSearch: Infinity}" />
+            <Select2  name="file"  v-model="filename" @select="(event)=>OnFileSelect(event.id)" :options="filenames" :settings="{width: '200px',minimumResultsForSearch: Infinity}" />
         </div>
-    </div>
+    </div> 
 </template>
 
 <script>
 /* eslint-disable */
-import Select2 from 'vue3-select2-component';
+//import Select2 from 'vue3-select2-component';
 function SetupFolder(metadata) {
     this.folders = metadata.queries;
     console.log(this.folders);
@@ -40,11 +40,11 @@ function OnFileSelect(event) {
     console.log("File selected");
     this.filename = event;
     console.log(this.filename);
-    this.updateValue(this.root+this.folder+"/"+this.filename);
+    this.updateValue({name:this.root+this.folder+"/"+this.filename,metadata:this.files[this.filename]});
 }
 
 export default {
-    components:{Select2},
+    //components:{Select2},
     props: {
         value: Number,
         root: String,
@@ -65,7 +65,6 @@ export default {
             console.log("updateValue",value);
             emit('input', value);
         }
-
         return { updateValue }
     },
     

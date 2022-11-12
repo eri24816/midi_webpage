@@ -9,6 +9,7 @@ const app = createApp(App);
 
     
 app.component('Select2', Select2);
+app.provide('whoIsPlaying', {id:0});
 
 const piano = new Piano({
 velocities: 5,
