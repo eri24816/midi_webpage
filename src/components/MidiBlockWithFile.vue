@@ -7,7 +7,7 @@
             
             <div style="margin:30px">
                 <p>
-                    Song name: {{ metadata.title }}
+                    <b>{{ metadata.title }}</b>
                 </p>
                 <p>
                     Bar: {{ metadata.start }} - {{ metadata.end }}

@@ -13,6 +13,27 @@
   <MidiBlockWithFile :w="700"  :sustain-opacity="sustainOpacity" :bpm="tempo" />
   <MidiBlockWithFile :w="700"  :sustain-opacity="sustainOpacity" :bpm="tempo" />
 
+  <div>
+    <h2>
+      說明:
+    </h2>
+    <p>
+      總共有 32 首 generated midi, 每首 midi 都分成 4 個 4-bar 的 query 去跟 dataset 的所有歌比較，取出最相似的 10 個 4-bar 片段。
+    </p>
+    <h3>
+      檔案命名規則:
+    </h3>
+    <ul>
+      <li>
+        4 小節的 query 片段: [ i ] / [ start_bar ] _query.mid
+      </li>
+      <li>
+        4 小節的 dataset 片段: [ i ] / [ start_bar ] _ [ rank ] .mid
+      </li>
+    </ul>
+    Where i ∈ [0, 32] is the generation index, start_bar ∈ {0,4,8,12} is the start bar of the query, and rank ∈ [0, 9] is the similarity rank.
+  </div>
+
 </template>
 
 <script>
