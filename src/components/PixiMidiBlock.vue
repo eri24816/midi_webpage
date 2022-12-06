@@ -27,6 +27,7 @@ function InitPixi() {
     cursorPreviewLine.x = -100;
 
     app.stage.addChild(cursorPreviewLine);
+    this.cursorPreviewLine = cursorPreviewLine;
 
     const cursorLine = new PIXI.Graphics()
         .lineStyle(2, 0xffffff, .5)
@@ -48,16 +49,67 @@ function InitPixi() {
         cursorPreviewLine.x = -100;
     });
     app.stage.addEventListener('pointerdown', (e) => {
-        this.tick = (e.data.global.x + this.shift) / this.PixelPerTick;
-        this.StopSounds();
-        this.lastTick = Math.floor(this.tick - 1);
-        this.lastUpdateTime = null;
-        this.whoIsPlaying.id = this.playerId;
+
     });
 
+    this.mouseData = { lastx: 0, lasty: 0, tick: 0, dragged: false };
+    app.stage.on('mousedown', (e) => {
+        this.mouseData.dragged = false;
+    })
+        // events for drag end
+        .on('mouseup', (e) => {
+            if (!this.mouseData.dragged) {
+                this.OnMouseClick(e);
+            }
+        })
+        .on('mouseupoutside', (e) => {
+            if (!this.mouseData.dragged) {
+                this.OnMouseClick(e);
+            } else {
+                this.OnDragEnd(e);
+            }
+        })
+        // events for drag move
+        .on('mousemove', (e) => {
+            if (e.buttons) {
+                if(!this.mouseData.dragged) {
+                    this.mouseData.dragged = true;
+                    this.OnDragStart(e);
+                }
+                this.OnDragMove(e);
+            }
+            this.mouseData.lastx = e.data.global.x;
+            this.mouseData.lasty = e.data.global.y;
+        });
+    
     this.pixi = app;
-
 }
+
+function OnDragStart(event) {
+    this.mouseData.tick = (event.data.global.x + this.shift) / this.PixelPerTick;
+}
+
+function OnDragEnd(event) {
+}
+
+function OnDragMove(event) {
+    console.log(this.mouseData.tick);
+    this.PixelPerTick *= Math.exp(-0.003 * (event.data.global.y - this.mouseData.lasty));
+    
+    if (this.mouseData.tick) {
+        this.shift = this.mouseData.tick*this.PixelPerTick - event.data.global.x;
+    }
+    this.UpdateCanvas();
+}
+
+function OnMouseClick(e) {
+    this.tick = (e.data.global.x + this.shift) / this.PixelPerTick;
+    this.StopSounds();
+    this.lastTick = Math.floor(this.tick - 1);
+    this.lastUpdateTime = null;
+    this.whoIsPlaying.id = this.playerId;
+}
+
 function LoadMidi() {
 
     console.log("Loading midi");
@@ -95,7 +147,7 @@ function LoadMidi() {
             }
         }
 
-        this.PixelPerTick = (this.w - 2*this.padding) / maxTick;
+        this.PixelPerTick = (this.w - 2*this.padding) / Math.min(32*8,maxTick);
         this.shift = - this.padding;
         
         const app = this.pixi;
@@ -130,6 +182,8 @@ function LoadMidi() {
             app.stage.addChild(rect);
         });
         this.noteList = noteList;
+
+        this.maxTick = maxTick;
         
         this.UpdateCanvas();
     });
@@ -243,6 +297,7 @@ export default {
             keyDownMap: null,
             keyUpMap: null,
             timer: null,
+            mouseData: null,
         }
     },
     watch: {
@@ -251,7 +306,25 @@ export default {
         },
         sustainOpacity: function(newVal, oldVal) {
             this.UpdateCanvas();
-        }
+        },
+        w: function(newVal, oldVal) {
+            this.pixi.renderer.resize(newVal, this.h);
+            //this.PixelPerTick = (newVal - 2*this.padding) / this.maxTick;
+            //this.shift = - this.padding;
+            //this.UpdateCanvas();
+        },
+        h: function(newVal, oldVal) {
+            this.pixi.renderer.resize(this.w, newVal);
+            for (let i = 0; i <= this.maxTick; i += 8) {
+            const alpha=[0.1,0.01,0.01,0.01,0.1,0.01,0.01,0.01]
+                const line = this.beatLines[i/8].clear()
+                    .lineStyle(2, 0xffffff, alpha[(i/8)%8])
+                    .lineTo(0, newVal); 
+            }
+            this.cursorPreviewLine.clear().lineStyle(2, 0xffffff, .2).lineTo(0, newVal);
+            this.cursorLine.clear().lineStyle(2, 0xffffff, .5).lineTo(0, newVal);
+            this.UpdateCanvas();
+        },
     },
     setup() {
         const piano = inject('piano');
@@ -267,7 +340,7 @@ export default {
             this.Update()
         }, 20);
     },
-    methods: {  InitPixi, LoadMidi, Update, UpdateCanvas,StopSounds },
+    methods: {  InitPixi, LoadMidi, Update, UpdateCanvas,StopSounds,OnDragStart,OnDragMove,OnDragEnd, OnMouseClick },
     beforeDestroy() {
         console.log('destroy');
         this.$refs.root.removeChild(this.app.view);

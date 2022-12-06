@@ -9,9 +9,11 @@
   <SideBar>
     <RangeInput label="Sustain Opacity" :value=sustainOpacity @input="value => sustainOpacity = value" min=0 max=1 step=0.01 /> 
     <RangeInput label="Tempo" :value=tempo @input="value => tempo = value" min=40 max=144 step=1 /> 
+    <RangeInput label="Width" :value=width @input="value => width = value" min=500 max=2100 step=1 /> 
+    <RangeInput label="Height" :value=height @input="value => height = value" min=100 max=1000 step=1 />
   </SideBar>
-  <MidiBlockWithFile :w="700"  :sustain-opacity="sustainOpacity" :bpm="tempo" />
-  <MidiBlockWithFile :w="700"  :sustain-opacity="sustainOpacity" :bpm="tempo" />
+  <MidiBlockWithFile :w="width" :h="height" :sustain-opacity="sustainOpacity" :bpm="tempo" />
+  <MidiBlockWithFile :w="width" :h="height"  :sustain-opacity="sustainOpacity" :bpm="tempo" />
 
   <div>
     <h2>
@@ -67,8 +69,8 @@ export default {
     return {
       sustainOpacity: 0.4,
       tempo: 100,
-      src1: '/midi/12similar/query.mid',
-      src2: '/midi/29similar/query.mid'
+      width: 1200,
+      height: 250,
     }
   },
   methods: {
