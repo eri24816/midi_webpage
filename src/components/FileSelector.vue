@@ -5,7 +5,7 @@
         </div>
         /
         <div style="display: inline-block;">
-            <Select2  name="file"  v-model="filename" @select="(event)=>OnFileSelect(event.id)" :options="filenames" :settings="{width: '200px',minimumResultsForSearch: Infinity}" />
+            <Select2  name="file"  v-model="filename" @select="(event)=>OnFileSelect(event.id)" :options="filenames" :settings="{width: '150px',minimumResultsForSearch: Infinity}" />
         </div>
     </div> 
 </template>

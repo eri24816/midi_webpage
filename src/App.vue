@@ -12,19 +12,24 @@
     <RangeInput label="Width" :value=width @input="value => width = value" min=500 max=2100 step=1 /> 
     <RangeInput label="Height" :value=height @input="value => height = value" min=100 max=1000 step=1 />
   </SideBar>
-  <MidiBlockWithFile :w="width" :h="height" :sustain-opacity="sustainOpacity" :bpm="tempo" />
-  <MidiBlockWithFile :w="width" :h="height"  :sustain-opacity="sustainOpacity" :bpm="tempo" />
 
+  <Suspense>
+    <ComparatorComponent folder="experiments/First8" num_elements=2 title="8 Bar Prompt" />
+  </Suspense>
+
+  <h2>Plagiarism Check</h2>
+  <MidiBlockWithFile :w="690" :h="height" :sustain-opacity="sustainOpacity" :bpm="tempo" />
+  <MidiBlockWithFile :w="690" :h="height" :sustain-opacity="sustainOpacity" :bpm="tempo" />
   <div>
-    <h2>
+    <h3>
       說明:
-    </h2>
+    </h3>
     <p>
       總共有 32 首 generated midi, 每首 midi 都分成 4 個 4-bar 的 query 去跟 dataset 的所有歌比較，取出最相似的 10 個 4-bar 片段。
     </p>
-    <h3>
+    <h4>
       檔案命名規則:
-    </h3>
+    </h4>
     <ul>
       <li>
         4 小節的 query 片段: [ i ] / [ start_bar ] _query.mid
@@ -44,6 +49,7 @@ import PixiMidiBlock from './components/PixiMidiBlock.vue';
 import SideBar from './components/SideBar.vue';
 import RangeInput from './components/RangeInput.vue';
 import MidiBlockWithFile from './components/MidiBlockWithFile.vue';
+import ComparatorComponent from './components/ComparatorComponent.vue';
 
 export default {
   name: 'App',
@@ -51,8 +57,9 @@ export default {
     PixiMidiBlock,
     SideBar,
     RangeInput,
-    MidiBlockWithFile
-  },
+    MidiBlockWithFile,
+    ComparatorComponent
+},
   setup() {
     var scripts = [
       "https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js",
@@ -88,10 +95,13 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #a2bfdd;
+  width: 1100px;
+  margin: auto;
   margin-top: 60px;
 }
 body{
   
   background-color: #21262C;
+  font-size: 75%;
 }
 </style>

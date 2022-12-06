@@ -3,7 +3,7 @@
         <div style="display:inline-block; ">
             <PixiMidiBlock :src="src" :w="w" :h="h" :padding="padding" :sustain-opacity="sustainOpacity" :bpm="bpm" />
         </div>
-        <div style="display:inline-block; width: 500px;   text-align: left;">
+        <div style="display:inline-block; width: 300px;   text-align: left;">
             
             <div style="margin:30px">
                 <p>
