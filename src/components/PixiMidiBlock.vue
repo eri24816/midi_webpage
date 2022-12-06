@@ -1,5 +1,5 @@
 <template>
-    <div ref="root">
+    <div ref="root" style="border: 2px gray; border-style: solid; border-radius: 3px;">
         <!-- {{src}} -->
     </div>
 </template>
@@ -16,7 +16,7 @@ import { HSVtoRGB } from '@/assets/graphicsUtils.js'
 function InitPixi() {
     const root = this.$refs.root;
 
-    const app = new PIXI.Application({ background: '#000000', width: this.w, height: this.h });
+    const app = new PIXI.Application({ background: '#0A0B0D', width: this.w, height: this.h });
     root.appendChild(app.view);
     app.stage.interactive = true;
     app.stage.hitArea = app.screen;
@@ -237,10 +237,10 @@ function UpdateCanvas() {
         const h = (this.h) / 88 - gap;
         const brightnessGain = 1+ ((note.ticks / 60) <= this.tick?  Math.exp(0.3*((note.ticks / 60)-this.tick)):0);
         note.graphics.clear();
-        note.graphics.beginFill(HSVtoRGB(note.midi / 12, 1 - (brightnessGain - 1) * 0.3, Math.min(1, note.velocity * this.sustainOpacity * brightnessGain)));
+        note.graphics.beginFill(HSVtoRGB(note.midi / 12, 1 - (brightnessGain - 1) * 0.3, Math.min(1, this.sustainOpacity * brightnessGain)));
         note.graphics.drawRect(x, y, w, h);
         note.graphics.endFill();
-        note.graphics.beginFill(HSVtoRGB(note.midi / 12, 1 - (brightnessGain - 1) * 0.3, Math.min(1, note.velocity * brightnessGain)));
+        note.graphics.beginFill(HSVtoRGB(note.midi / 12, 1 - (brightnessGain - 1) * 0.3, Math.min(1, brightnessGain)));
         note.graphics.drawRect(x - (h + 2) / 2, y - 1, h + 2, h + 2);
         note.graphics.endFill();
     });

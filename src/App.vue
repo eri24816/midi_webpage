@@ -92,6 +92,6 @@ export default {
 }
 body{
   
-  background-color: #000000;
+  background-color: #21262C;
 }
 </style>
