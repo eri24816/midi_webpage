@@ -6,6 +6,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Literata&display=swap" rel="stylesheet">
 
   </head>
+  <h1>Music Generation Demo Page</h1>
   <SideBar>
     <RangeInput label="Sustain Opacity" :value=sustainOpacity @input="value => sustainOpacity = value" min=0 max=1 step=0.01 /> 
     <RangeInput label="Tempo" :value=tempo @input="value => tempo = value" min=40 max=144 step=1 /> 
@@ -13,9 +14,9 @@
     <RangeInput label="Height" :value=height @input="value => height = value" min=100 max=1000 step=1 />
   </SideBar>
 
-  <Suspense>
-    <ComparatorComponent folder="experiments/First8" num_elements=2 title="8 Bar Prompt" />
-  </Suspense>
+    <ComparatorComponent folder="experiments/First8" num_elements=2 title="8 Bars Prompt" />
+    <ComparatorComponent folder="experiments/First4" num_elements=2 title="4 Bars Prompt" />
+    <ComparatorComponent folder="experiments/First4+Last4" num_elements=2 title="Infilling: 4 - ? - 4" />
 
   <h2>Plagiarism Check</h2>
   <MidiBlockWithFile :w="690" :h="height" :sustain-opacity="sustainOpacity" :bpm="tempo" />
@@ -90,18 +91,24 @@ export default {
 
 <style>
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  font-family: Cursive;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #a2bfdd;
+  color: #e7e7e7;
   width: 1100px;
   margin: auto;
   margin-top: 60px;
 }
 body{
-  
   background-color: #21262C;
-  font-size: 75%;
+  font-size: 80%;
+}
+.select2-container--default .select2-selection--single {
+  border: none !important;
+  margin:5px;
+}
+h1,h2{
+  color: #EBC95B;
 }
 </style>

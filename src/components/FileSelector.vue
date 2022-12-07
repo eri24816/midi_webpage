@@ -121,7 +121,7 @@ option{
 }
     /* Change the appearence of the search input field */
     .select2-search input {
-        color: wheat !important;
+        color: #88AA78 !important;
         background-color: #343A40 !important;
     }
 
@@ -133,7 +133,7 @@ option{
 /* Change the appearence of the dropdown select container */
 ::v-deep(.select2-container--bootstrap-5 .select2-selection) {
     border-color: #474e53 !important;
-    color: wheat !important;
+    color: #88AA78 !important;
     background-color: #343A40 !important;
 }
 
@@ -145,21 +145,21 @@ option{
 /* Change the color of the default selected item i.e. the first option */
 .select2-container--default .select2-selection--single .select2-selection__rendered {
     background-color: black;
-    color: wheat !important;
+    color: #88AA78 !important;
 }
 
 .select2-results__option--highlighted[aria-selected]{
     background-color: rgb(29, 20, 14)  !important;
-    color: wheat;
+    color: #88AA78;
 }
 
 .select2-results__option[aria-selected=true]{
-    background-color: rgb(78, 53, 35)  !important;
+    background-color: #2a434b  !important;
 }
 
 .select2-results__option[aria-selected]{
     background-color: black;
-    color: wheat;
+    color: #88AA78;
 }
 
 </style>

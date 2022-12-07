@@ -11,14 +11,14 @@
         <Select2 v-for="(independent_param_value, i) in independent_param_values" :name="'indsel'+i" :key="'indsel'+i" v-model="independent_param_values[i]" @select="(event)=>OnIndependentParamChanged(i,event.id)" :options="dimensions[independent_param_name].value_range" :settings="{width: '300px',minimumResultsForSearch: Infinity}"/>
       </div>
       <div>
-        <h3>3. Set the control param</h3>
+        <h3>3. Set the control params</h3>
         <div  v-for="(control_param_name, i) in Object.keys(control_params)" :key="'consel'+i" class="colflexbox" >
           {{control_param_name}}
           <Select2 :name="'consel'+i" v-model="control_params[control_param_name]" @select="(event) => OnControlParamChanged(control_param_name,event.id)" :options="dimensions[control_param_name].value_range" :settings="{width: '300px',minimumResultsForSearch: Infinity}"/>
         </div>
       </div>
     </div>
-    <PixiMidiBlock v-for="file in files_element" :key="file"  :w="1000" :h="250" :padding="20" :sustainOpacity="0.4" :bpm="140" :src="file" style="width:1000px" class="centered-block"/>
+    <PixiMidiBlock v-for="(file,i) in files_element" :key="i"  :w="1000" :h="250" :padding="20" :sustainOpacity="0.4" :bpm="120" :src="file" style="width:1000px" class="centered-block"/>
   </div>
 
 </template>

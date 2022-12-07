@@ -64,7 +64,7 @@ function InitPixi() {
         })
         .on('mouseupoutside', (e) => {
             if (!this.mouseData.dragged) {
-                this.OnMouseClick(e);
+                //this.OnMouseClick(e);
             } else {
                 this.OnDragEnd(e);
             }
@@ -113,7 +113,16 @@ function OnMouseClick(e) {
 function LoadMidi() {
 
     console.log("Loading midi");
-    Midi.fromUrl(this.src).then((midi) => {
+    var success = true;
+    Midi.fromUrl(this.src)
+        .catch(function (e) {
+            console.log(e);
+            success = false;
+        })
+        .then((midi) => {
+        if(!success){
+            return;
+        }
         // store the notes into a map
         const noteList = midi.tracks[0].notes;
         const keyDownMap = new Map();
@@ -147,7 +156,7 @@ function LoadMidi() {
             }
         }
 
-        this.PixelPerTick = (this.w - 2*this.padding) / Math.min(32*8,maxTick);
+        this.PixelPerTick = (this.w - 2*this.padding) / Math.min(32*16,maxTick);
         this.shift = - this.padding;
         
         const app = this.pixi;
@@ -215,7 +224,7 @@ function Update() {
         if (this.keyDownMap.has(t)) {
             this.keyDownMap.get(t).forEach((note) => {
                 const pitch = Midi2Pitch(note.midi);
-                this.piano.keyDown({ note: pitch, velocity: note.velocity});
+                this.piano.keyDown({ note: pitch, velocity: note.velocity*this.velocity_factor});
             });
         }
 
@@ -284,6 +293,10 @@ export default {
             type: Number,
             default: 100
         },
+        velocity_factor: {
+            type: Number,
+            default: 0.8 // the sound font is to hard
+        },
         
     },
     data() {
@@ -338,10 +351,11 @@ export default {
         LoadMidi.call(this);
         this.timer = setInterval(() => {
             this.Update()
-        }, 20);
+        }, 5);
     },
     methods: {  InitPixi, LoadMidi, Update, UpdateCanvas,StopSounds,OnDragStart,OnDragMove,OnDragEnd, OnMouseClick },
     beforeDestroy() {
+        this.StopSounds();
         console.log('destroy');
         this.$refs.root.removeChild(this.app.view);
         clearInterval(this.timer);
